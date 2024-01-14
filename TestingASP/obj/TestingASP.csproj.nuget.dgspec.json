@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\tmas4\\RiderProjects\\WebApplication1\\TestingASP\\TestingASP.csproj": {}
+    "C:\\Users\\micha\\Documents\\testing-.asp\\TestingASP\\TestingASP.csproj": {}
   },
   "projects": {
-    "C:\\Users\\tmas4\\RiderProjects\\WebApplication1\\TestingASP\\TestingASP.csproj": {
+    "C:\\Users\\micha\\Documents\\testing-.asp\\TestingASP\\TestingASP.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\tmas4\\RiderProjects\\WebApplication1\\TestingASP\\TestingASP.csproj",
+        "projectUniqueName": "C:\\Users\\micha\\Documents\\testing-.asp\\TestingASP\\TestingASP.csproj",
         "projectName": "TestingASP",
-        "projectPath": "C:\\Users\\tmas4\\RiderProjects\\WebApplication1\\TestingASP\\TestingASP.csproj",
-        "packagesPath": "C:\\Users\\tmas4\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\tmas4\\RiderProjects\\WebApplication1\\TestingASP\\obj\\",
+        "projectPath": "C:\\Users\\micha\\Documents\\testing-.asp\\TestingASP\\TestingASP.csproj",
+        "packagesPath": "C:\\Users\\micha\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\micha\\Documents\\testing-.asp\\TestingASP\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\tmas4\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\micha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

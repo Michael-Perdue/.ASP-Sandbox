@@ -12,4 +12,9 @@ public class RandomData
         Id = id;
         Value2 = value2;
     }
+
+    public override string ToString()
+    {
+        return "ID: " + Id.ToString() + ", Message: " + Message + ", Value2: " + Value2;
+    }
 }
