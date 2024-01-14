@@ -10,6 +10,7 @@ public class RandomController : ControllerBase
         private readonly ILogger<RandomController> _logger;
         private Dictionary<int, RandomData> data;
         private Dictionary<int, string> users;
+        private string datapath;
 
         public RandomController(ILogger<RandomController> logger)
         {
@@ -19,13 +20,14 @@ public class RandomController : ControllerBase
             {
                 data.Add(i,new RandomData("test",i,Random.Shared.Next().ToString()));
             }
+            datapath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(),"data"),"logins.csv");
             _logger = logger;
             loadUsers();
 
         }
 
         private void loadUsers(){
-            using (TextFieldParser parser = new TextFieldParser(Path.Combine(Path.Combine(Directory.GetCurrentDirectory(),"data"),"logins.csv")))
+            using (TextFieldParser parser = new TextFieldParser(datapath))
             {
                 parser.SetDelimiters(",");
                 while(!parser.EndOfData){
@@ -36,22 +38,39 @@ public class RandomController : ControllerBase
             }
         }
 
-        [HttpGet("GetRandom/{id}",Name = "GetRandom")]
+        [HttpGet("Get/Random/{id}",Name = "GetRandom")]
         [ProducesResponseType(typeof(RandomData), 200)]
-        public IActionResult GetRandom(string id)
+        public ActionResult GetRandom(string id)
         {
             int idNum = int.Parse(id);
             return Check(idNum,data);
         }
 
-        [HttpGet("GetUser/{id}",Name = "GetUser")]
-        public IActionResult GetUser(string id)
+        [HttpGet("Get/User/{id}",Name = "GetUser")]
+        public ActionResult GetUser(string id)
         {
             int idNum = int.Parse(id);
             return Check(idNum,users);
         }
+        
+        [HttpGet("Add/User",Name = "AddUser")]
+        public async Task<ActionResult> AddUser([FromQuery] string user,[FromQuery] string pass)
+        {
+            int id = users.Keys.Max()+1;
+            await using(StreamWriter writer = new StreamWriter(datapath)){
+                try{
+                    _logger.LogInformation("Attempt to create user: " + id + "," + user + "," + pass);
+                    writer.WriteLine(id + "," + user + "," + pass);
+                    _logger.LogInformation("User Created ID: " + id);
+                    return Ok("Id: "+id.ToString());
+                }catch (Exception exception) {
+                    _logger.LogError(exception.ToString());
+                    return  BadRequest(exception.ToString()); 
+                }
+            }
+        }
 
-        public IActionResult Check<T>(int id, Dictionary<int,T> dictionary)
+        public ActionResult Check<T>(int id, Dictionary<int,T> dictionary)
         {
             _logger.LogInformation(dictionary[id]?.ToString());
             if(users.ContainsKey(id))
