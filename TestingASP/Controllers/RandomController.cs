@@ -32,8 +32,12 @@ public class RandomController : ControllerBase
                 parser.SetDelimiters(",");
                 while(!parser.EndOfData){
                     string[]? info = parser.ReadFields();
-                    users.Add(int.Parse(info[0]),info[1]);
-                   _logger.LogInformation(String.Join(",",info));
+                    try{
+                        users.Add(int.Parse(info[0]),info[1]);
+                    _logger.LogInformation(string.Join(",",info));
+                    }catch(Exception exception){
+                        _logger.LogError(exception.ToString());
+                    }
                 }
             }
         }
@@ -57,6 +61,13 @@ public class RandomController : ControllerBase
         public async Task<ActionResult> AddUser([FromQuery] string user,[FromQuery] string pass)
         {
             int id = users.Keys.Max()+1;
+
+            if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass))
+            {
+                _logger.LogWarning("Invalid user or pass when adding user");
+                return BadRequest("Invalid user or pass");
+            }
+
             await using(StreamWriter writer = new StreamWriter(datapath)){
                 try{
                     _logger.LogInformation("Attempt to create user: " + id + "," + user + "," + pass);
