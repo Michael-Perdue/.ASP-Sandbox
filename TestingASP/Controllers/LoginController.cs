@@ -4,18 +4,18 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace TestingASP.Controllers;
 [ApiController]
-[Route("api/Random")]
-public class RandomController : ControllerBase
+[Route("api/login")]
+public class LoginController : ControllerBase
 {
-        private readonly ILogger<RandomController> _logger;
+        private readonly ILogger<LoginController> _logger;
         private Dictionary<int, RandomData> data;
-        private Dictionary<int, string> users;
+        private Dictionary<int, User> users;
         private string datapath;
 
-        public RandomController(ILogger<RandomController> logger)
+        public LoginController(ILogger<LoginController> logger)
         {
             data = new Dictionary<int, RandomData>();
-            users = new Dictionary<int, string>();
+            users = new Dictionary<int, User>();
             for (int i = 0; i < 5; i++)
             {
                 data.Add(i,new RandomData("test",i,Random.Shared.Next().ToString()));
@@ -33,8 +33,8 @@ public class RandomController : ControllerBase
                 while(!parser.EndOfData){
                     string[]? info = parser.ReadFields();
                     try{
-                        users.Add(int.Parse(info[0]),info[1]);
-                    _logger.LogInformation(string.Join(",",info));
+                        users.Add(int.Parse(info[0]), new User(int.Parse(info[0]),info[1],info[2]));
+                        _logger.LogInformation(string.Join(",",info));
                     }catch(Exception exception){
                         _logger.LogError(exception.ToString());
                     }
@@ -50,12 +50,26 @@ public class RandomController : ControllerBase
             return Check(idNum,data);
         }
 
-        [HttpGet("Get/User/{id}",Name = "GetUser")]
-        public ActionResult GetUser(string id)
+        [HttpGet("Get/User",Name = "GetUser")]
+        public ActionResult GetUser([FromQuery] string? id, [FromQuery] string? user = "",[FromQuery] string? pass = "")
         {
-            int idNum = int.Parse(id);
-            return Check(idNum,users);
+            _logger.LogInformation("tst");
+            if(!string.IsNullOrEmpty(id)){  
+                int idNum = int.Parse(id);
+                return Check(idNum,users);
+            }
+            else if(!string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(pass)){
+                foreach (User value in users.Values)
+                {
+                    if (value.match(user,pass)){
+                        return Ok(value);
+                    }
+                }
+                return NotFound();
+            }
+            return BadRequest();
         }
+
         
         [HttpGet("Add/User",Name = "AddUser")]
         public async Task<ActionResult> AddUser([FromQuery] string user,[FromQuery] string pass)
@@ -83,9 +97,10 @@ public class RandomController : ControllerBase
 
         public ActionResult Check<T>(int id, Dictionary<int,T> dictionary)
         {
-            _logger.LogInformation(dictionary[id]?.ToString());
-            if(users.ContainsKey(id))
-                return Ok(dictionary[id]?.ToString());
+            if(dictionary.ContainsKey(id)){
+                _logger.LogInformation(dictionary[id]?.ToString());
+                return Ok(dictionary[id]);
+            }
             return NotFound();
         }
 }
