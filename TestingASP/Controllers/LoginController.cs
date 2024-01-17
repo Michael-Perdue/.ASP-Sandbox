@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic.FileIO;
 
@@ -59,6 +61,7 @@ public class LoginController : ControllerBase
                 return Check(idNum,users);
             }
             else if(!string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(pass)){
+                pass = HashString(pass);
                 foreach (User value in users.Values)
                 {
                     if (value.match(user,pass)){
@@ -82,10 +85,13 @@ public class LoginController : ControllerBase
                 return BadRequest("Invalid user or pass");
             }
 
-            await using(StreamWriter writer = new StreamWriter(datapath)){
-                try{
-                    _logger.LogInformation("Attempt to create user: " + id + "," + user + "," + pass);
-                    writer.WriteLine(id + "," + user + "," + pass);
+            await using(StreamWriter writer = new StreamWriter(datapath,true)){
+                try
+                {
+                    string password = HashString(pass);
+                    _logger.LogInformation("Attempt to create user: " + id + "," + user + "," + password);
+                    writer.WriteLine(id + "," + user + "," + password);
+                    users.Add(id, new User(id,user,password));
                     _logger.LogInformation("User Created ID: " + id);
                     return Ok("Id: "+id.ToString());
                 }catch (Exception exception) {
@@ -102,5 +108,17 @@ public class LoginController : ControllerBase
                 return Ok(dictionary[id]);
             }
             return NotFound();
+        }
+
+        private string HashString (string bytes)
+        {
+            HashAlgorithm sha256 = SHA256.Create();
+            byte[] result = sha256.ComputeHash(Encoding.ASCII.GetBytes(bytes));
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (byte value in result)
+            {
+                stringBuilder.Append(value.ToString("x2"));
+            }
+            return stringBuilder.ToString();
         }
 }
