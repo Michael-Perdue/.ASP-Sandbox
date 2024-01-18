@@ -74,7 +74,7 @@ public class LoginController : ControllerBase
         }
 
         
-        [HttpGet("Add/User",Name = "AddUser")]
+        [HttpPost("Add/User",Name = "AddUser")]
         public async Task<ActionResult> AddUser([FromQuery] string user,[FromQuery] string pass)
         {
             int id = users.Keys.Max()+1;
@@ -110,15 +110,18 @@ public class LoginController : ControllerBase
             return NotFound();
         }
 
-        private string HashString (string bytes)
+        private static string HashString (string bytes)
         {
-            HashAlgorithm sha256 = SHA256.Create();
-            byte[] result = sha256.ComputeHash(Encoding.ASCII.GetBytes(bytes));
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (byte value in result)
+            using (HashAlgorithm sha256 = SHA256.Create())
             {
-                stringBuilder.Append(value.ToString("x2"));
+                byte[] result = sha256.ComputeHash(Encoding.ASCII.GetBytes(bytes));
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (byte value in result)
+                {
+                    stringBuilder.Append(value.ToString("x2"));
+                }
+
+                return stringBuilder.ToString();
             }
-            return stringBuilder.ToString();
         }
 }
