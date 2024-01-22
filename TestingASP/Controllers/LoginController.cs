@@ -11,7 +11,7 @@ namespace TestingASP.Controllers;
 public class LoginController : ControllerBase
 {
     private readonly ILogger<LoginController> _logger;
-    private Dictionary<int, RandomData> data;
+    public Dictionary<int, RandomData> data;
     private Dictionary<int, User> users;
     private string datapath;
 
