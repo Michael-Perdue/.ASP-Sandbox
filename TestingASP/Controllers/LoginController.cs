@@ -26,11 +26,11 @@ public class LoginController : ControllerBase
 
         datapath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "data"), "logins.csv");
         _logger = logger;
-        loadUsers();
+        LoadUsers();
 
     }
 
-    private void logRequest(string type, string status, string additional)
+    private void LogRequest(string type, string status, string? additional = "null")
     {
         string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         if(ip.Equals("::1"))
@@ -51,7 +51,7 @@ public class LoginController : ControllerBase
         
     }
 
-    private void loadUsers()
+    private void LoadUsers()
     {
         using (TextFieldParser parser = new TextFieldParser(datapath))
         {
@@ -87,7 +87,12 @@ public class LoginController : ControllerBase
         if (!string.IsNullOrEmpty(id))
         {
             int idNum = int.Parse(id);
-            return Check(idNum, users);
+            ActionResult result = Check(idNum, users);
+            if (result is OkObjectResult)
+                LogRequest("api/login/Get/User","200",id);
+            else
+                LogRequest("api/login/Get/User","404",id);
+            return result;
         }
         else if (!string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(pass))
         {
@@ -96,14 +101,16 @@ public class LoginController : ControllerBase
             {
                 if (value.match(user, pass))
                 {
-                    logRequest("api/login/Get/User","200",user+","+pass);
+                    LogRequest("api/login/Get/User","200",user+","+pass);
                     return Ok(value);
                 }
             }
 
+            LogRequest("api/login/Get/User","404",user+","+pass);
             return NotFound();
         }
 
+        LogRequest("api/login/Get/User","400");
         return BadRequest();
     }
 
