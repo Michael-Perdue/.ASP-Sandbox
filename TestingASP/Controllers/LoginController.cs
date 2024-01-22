@@ -30,6 +30,27 @@ public class LoginController : ControllerBase
 
     }
 
+    private void logRequest(string type, string status, string additional)
+    {
+        string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        if(ip.Equals("::1"))
+            ip = "127.0.0.1";
+        using (StreamWriter writer = new StreamWriter(Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "data"), "logs.csv"), true))
+        {
+            try
+            {
+                _logger.LogInformation("Attempting to log type: " + type );
+                writer.WriteLine(ip + "," + type + "," + status + "," + additional);
+                _logger.LogInformation("Logged type: " + type);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception.ToString());
+            }
+        }
+        
+    }
+
     private void loadUsers()
     {
         using (TextFieldParser parser = new TextFieldParser(datapath))
@@ -75,6 +96,7 @@ public class LoginController : ControllerBase
             {
                 if (value.match(user, pass))
                 {
+                    logRequest("api/login/Get/User","200",user+","+pass);
                     return Ok(value);
                 }
             }
