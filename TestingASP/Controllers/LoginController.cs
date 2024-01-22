@@ -77,7 +77,13 @@ public class LoginController : ControllerBase
     public ActionResult GetRandom(string id)
     {
         int idNum = int.Parse(id);
-        return Check(idNum, data);
+        ActionResult result = Check(idNum, data);
+        if (result is OkObjectResult)
+            LogRequest("api/login/Get/Random/"+id,"200");
+        else
+            LogRequest("api/login/Get/Random/"+id,"404");
+        return result;
+        
     }
 
     [HttpGet("Get/User", Name = "GetUser")]
@@ -122,8 +128,8 @@ public class LoginController : ControllerBase
 
         if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass))
         {
-            _logger.LogWarning("Invalid user or+-" +
-                               " pass when adding user");
+            _logger.LogWarning("Invalid user or pass when adding user");
+            LogRequest("api/login/Add/User","400","Invalid user or pass when adding user");
             return BadRequest("Invalid user or pass");
         }
 
@@ -137,11 +143,13 @@ public class LoginController : ControllerBase
                 User newUser = new User(id, user, password);
                 users.Add(id, newUser);
                 _logger.LogInformation("User Created ID: " + id);
+                LogRequest("api/login/Add/User","201",id.ToString());
                 return Created("api/login/Get/User?id=" + id, newUser);
             }
             catch (Exception exception)
             {
                 _logger.LogError(exception.ToString());
+                LogRequest("api/login/Add/User","400");
                 return BadRequest(exception.ToString());
             }
         }
