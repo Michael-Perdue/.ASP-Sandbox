@@ -155,6 +155,7 @@ public class LoginController : ControllerBase
         }
     }
 
+    [NonAction]
     public ActionResult Check<T>(int id, Dictionary<int, T> dictionary)
     {
         if (dictionary.ContainsKey(id))
@@ -166,6 +167,7 @@ public class LoginController : ControllerBase
         return NotFound();
     }
 
+    [NonAction]
     public string HashString(string bytes)
     {
         using (HashAlgorithm sha256 = SHA256.Create())
