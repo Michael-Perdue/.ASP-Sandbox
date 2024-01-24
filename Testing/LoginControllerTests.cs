@@ -82,4 +82,35 @@ public class LoginControllerTests
         Assert.IsType<NotFoundResult>(result);
         Assert.Equal(404, (result as NotFoundResult)?.StatusCode);
     }
+    
+    [Fact]
+    public void GetUserApiCall_Returns_BadRequestResult()
+    {
+        LoginController controller = GetNewController(new QueryCollection());
+        ActionResult result = controller.GetUser(null,null,"pass");
+        Assert.IsType<BadRequestResult>(result);
+        Assert.Equal(400, (result as BadRequestResult)?.StatusCode);
+        result = controller.GetUser(null,null,null);
+        Assert.IsType<BadRequestResult>(result);
+        Assert.Equal(400, (result as BadRequestResult)?.StatusCode);
+        result = controller.GetUser(null,"user",null);
+        Assert.IsType<BadRequestResult>(result);
+        Assert.Equal(400, (result as BadRequestResult)?.StatusCode);
+    }
+    
+    [Fact]
+    public void GetUserApiCall_Returns_OkResult()
+    {
+        LoginController controller = GetNewController(new QueryCollection());
+        controller.users[1] = new User(1, "user", controller.HashString("pass"));
+        ActionResult result = controller.GetUser(null,"user","pass");
+        Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, (result as OkObjectResult)?.StatusCode);
+        result = controller.GetUser("1");
+        Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, (result as OkObjectResult)?.StatusCode);
+        result = controller.GetUser("1",null,null);
+        Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, (result as OkObjectResult)?.StatusCode);
+    }
 }

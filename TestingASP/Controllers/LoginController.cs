@@ -12,7 +12,7 @@ public class LoginController : ControllerBase
 {
     private readonly ILogger<LoginController> _logger;
     public Dictionary<int, RandomData> data;
-    private Dictionary<int, User> users;
+    public Dictionary<int, User> users;
     private string datapath;
 
     public LoginController(ILogger<LoginController> logger)
@@ -166,7 +166,7 @@ public class LoginController : ControllerBase
         return NotFound();
     }
 
-    private static string HashString(string bytes)
+    public string HashString(string bytes)
     {
         using (HashAlgorithm sha256 = SHA256.Create())
         {
